@@ -33,12 +33,19 @@ export default function Overview() {
   const pendingCount = patients.filter(p => parseFloat(p.balance || 0) > 0).length;
 
   // 3. Treatments Today
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
   const todayAppointments = appointments.filter(appt => {
-    const apptDate = appt.date_time?.split(' ')[0] || appt.date_time?.split('T')[0];
-    return apptDate === todayStr;
+    if (!appt.date_time) return false;
+    // Handle both Y-m-d H:i:s and ISO format
+    const apptDate = new Date(appt.date_time.replace(' ', 'T'));
+    return apptDate >= todayStart && apptDate <= todayEnd;
+  }).sort((a, b) => {
+    return new Date(a.date_time.replace(' ', 'T')).getTime() - new Date(b.date_time.replace(' ', 'T')).getTime();
   });
+  
   const treatmentsTodayCount = todayAppointments.length;
 
   // Dynamic Staff (real data from API)
@@ -46,13 +53,14 @@ export default function Overview() {
     id: s.id,
     name: s.name,
     role: s.role || 'Staff Member',
-    avatar: `https://i.pravatar.cc/150?u=${s.id}`,
+    avatar: `https://avatar.iran.liara.run/public/doctor?username=${s.id}`,
     status: s.status === 'active' ? 'On Duty' : 'On Break'
   }));
 
   // Dynamic Schedule (real data from today's appointments)
-  const displaySchedule = todayAppointments.slice(0, 3).map(appt => {
-    const time = new Date(appt.date_time.replace(' ', 'T')).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const displaySchedule = todayAppointments.map(appt => {
+    const apptDate = new Date(appt.date_time.replace(' ', 'T'));
+    const time = apptDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     const patientName = appt.patient?.name || (appt.patient?.first_name ? `${appt.patient.first_name} ${appt.patient.last_name}` : 'Unknown Patient');
     return {
       time,
@@ -63,8 +71,8 @@ export default function Overview() {
     };
   });
 
-  // Next Appointment for Hero Card
-  const nextAppt = todayAppointments[0];
+  // Next Appointment for Hero Card (Next upcoming appointment starting FROM NOW)
+  const nextAppt = todayAppointments.find(appt => new Date(appt.date_time.replace(' ', 'T')) >= now);
   const nextApptPatientName = nextAppt?.patient?.name || (nextAppt?.patient?.first_name ? `${nextAppt.patient.first_name} ${nextAppt.patient.last_name}` : 'No upcoming appt');
 
   return (
@@ -265,10 +273,15 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
     'Checked In': 'bg-green-50 text-green-600 border-green-100',
     'Confirmed': 'bg-blue-50 text-blue-600 border-blue-100',
     'Pending': 'bg-orange-50 text-orange-600 border-orange-100',
+    'Scheduled': 'bg-blue-50 text-blue-600 border-blue-100',
+    'In Progress': 'bg-purple-50 text-purple-600 border-purple-100',
+    'Completed': 'bg-emerald-50 text-emerald-600 border-emerald-100',
   };
 
+  const currentStyle = styles[status] || 'bg-gray-50 text-gray-600 border-gray-100';
+
   return (
-    <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${styles[status]}`}>
+    <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${currentStyle}`}>
       {status}
     </span>
   );

@@ -160,26 +160,6 @@ export default function AdminSchedule() {
                   <div className="text-[0.65rem] text-gray-500 font-medium">Scheduled for today</div>
                 </div>
               </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-xl font-bold text-purple-600" suppressHydrationWarning>
-                  {isMounted ? pendingCount : '-'}
-                </div>
-                <div>
-                  <div className="font-bold text-gray-900 text-sm">Pending Approval</div>
-                  <div className="text-[0.65rem] text-gray-500 font-medium">Request from online portal</div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-xl font-bold text-orange-500" suppressHydrationWarning>
-                  {isMounted ? urgentCount : '-'}
-                </div>
-                <div>
-                  <div className="font-bold text-gray-900 text-sm">Urgent Reviews</div>
-                  <div className="text-[0.65rem] text-gray-500 font-medium">Requiring admin attention</div>
-                </div>
-              </div>
             </div>
           </div>
 

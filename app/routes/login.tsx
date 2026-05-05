@@ -91,7 +91,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 anim-fade-up">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 anim-fade-up" suppressHydrationWarning>
       {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute w-[600px] h-[600px] rounded-full top-[-20%] left-[-10%]" style={{ background: "radial-gradient(circle, rgba(164,240,239,0.15), transparent 70%)" }} />
@@ -114,18 +114,19 @@ export default function Login() {
         {/* Role Tabs */}
         <div className="flex border-b border-gray-200 mb-6">
           {ROLE_TABS.map(tab => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => handleRoleSwitch(tab.id)}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${
-                selectedRole === tab.id
-                  ? "text-[#003B95] border-b-2 border-[#003B95]"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {tab.label}
-            </button>
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleRoleSwitch(tab.id)}
+                className={`flex-1 py-3 text-sm font-semibold transition-colors ${
+                  selectedRole === tab.id
+                    ? "text-[#003B95] border-b-2 border-[#003B95]"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+                suppressHydrationWarning
+              >
+                {tab.label}
+              </button>
           ))}
         </div>
 
@@ -149,6 +150,7 @@ export default function Login() {
                 onChange={e => setEmail(e.target.value)}
                 className="appearance-none block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003B95] sm:text-sm"
                 placeholder="name@email.com"
+                suppressHydrationWarning
               />
             </div>
           </div>
@@ -171,8 +173,9 @@ export default function Login() {
                 onChange={e => setPassword(e.target.value)}
                 className="appearance-none block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003B95] sm:text-sm"
                 placeholder="••••••••"
+                suppressHydrationWarning
               />
-              <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400">
+              <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400" suppressHydrationWarning>
                 <span className="material-symbols-outlined text-lg">visibility</span>
               </button>
             </div>
@@ -191,6 +194,7 @@ export default function Login() {
             type="submit"
             disabled={loading}
             className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#003B95] hover:bg-[#002D73] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#003B95] disabled:opacity-60"
+            suppressHydrationWarning
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
@@ -207,6 +211,7 @@ export default function Login() {
           <button
             type="button"
             className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#003B95]"
+            suppressHydrationWarning
           >
             <span className="material-symbols-outlined text-lg">fingerprint</span>
             Sign in with Biometrics
@@ -220,7 +225,7 @@ export default function Login() {
             <div>{demo.email}</div>
             <div>{demo.password}</div>
           </div>
-          <button type="button" onClick={fillDemo} className="text-[0.6875rem] font-bold text-[#003B95] hover:underline">
+          <button type="button" onClick={fillDemo} className="text-[0.6875rem] font-bold text-[#003B95] hover:underline" suppressHydrationWarning>
             Auto-fill credentials →
           </button>
         </div>

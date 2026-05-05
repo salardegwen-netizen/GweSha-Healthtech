@@ -1,6 +1,7 @@
 import type { Route } from "./+types/billing";
 import PatientLayout from "~/components/patient/PatientLayout";
 import { useData } from "~/lib/DataContext";
+import { toast } from "sonner";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,6 +15,20 @@ export default function Billing() {
   const outstandingBalance = invoices?.reduce((total: number, inv: any) => {
     return inv.status?.toLowerCase() === 'due' ? total + parseFloat(inv.amount || 0) : total;
   }, 0) || 0;
+
+  // Derive summary stats
+  const paidInvoices = invoices?.filter((inv: any) => inv.status?.toLowerCase() === 'paid') || [];
+  const lastPayment = [...paidInvoices].sort((a: any, b: any) => new Date(b.date || b.created_at).getTime() - new Date(a.date || a.created_at).getTime())[0];
+  const lastPaymentDisplay = lastPayment ? {
+    amount: parseFloat(lastPayment.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    date: new Date(lastPayment.date || lastPayment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  } : null;
+
+  const dueInvoices = invoices?.filter((inv: any) => inv.status?.toLowerCase() === 'due') || [];
+  const nextDue = [...dueInvoices].sort((a: any, b: any) => new Date(a.date || a.created_at).getTime() - new Date(b.date || b.created_at).getTime())[0];
+  const nextDueDisplay = nextDue ? new Date(nextDue.date || nextDue.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'None';
+
+  const statementCount = invoices?.length || 0;
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return { month: 'N/A', day: '', year: '' };
@@ -50,7 +65,10 @@ export default function Billing() {
             </div>
             
             <div className="flex gap-4">
-              <button className="bg-white text-[#1A56DB] font-bold py-3 px-8 rounded-xl shadow-sm hover:bg-gray-50 transition-colors">
+              <button 
+                onClick={() => toast.success(`Payment portal redirected. Processing your ₱${outstandingBalance.toLocaleString()} payment...`)}
+                className="bg-white text-[#1A56DB] font-bold py-3 px-8 rounded-xl shadow-sm hover:bg-gray-50 transition-colors"
+              >
                 Pay Now
               </button>
               <button className="bg-white/20 text-white font-bold py-3 px-8 rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm">
@@ -97,15 +115,18 @@ export default function Billing() {
             <div className="bg-[#E5EDFF] rounded-2xl p-6 flex justify-between items-center text-center">
               <div className="flex-1 border-r border-[#003B95]/10">
                 <p className="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Last Payment</p>
-                <p className="text-sm font-bold text-gray-900">$240.00 <span className="text-gray-500 font-normal text-xs">on Oct 12</span></p>
+                <p className="text-sm font-bold text-gray-900" suppressHydrationWarning>
+                  {lastPaymentDisplay ? `₱${lastPaymentDisplay.amount}` : 'None'} 
+                  {lastPaymentDisplay && <span className="text-gray-500 font-normal text-xs ml-1">on {lastPaymentDisplay.date}</span>}
+                </p>
               </div>
               <div className="flex-1 border-r border-[#003B95]/10">
                 <p className="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Next Due</p>
-                <p className="text-sm font-bold text-gray-900">Oct 31, 2023</p>
+                <p className="text-sm font-bold text-gray-900" suppressHydrationWarning>{nextDueDisplay}</p>
               </div>
               <div className="flex-1">
                 <p className="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Statements</p>
-                <p className="text-sm font-bold text-gray-900">12 Available</p>
+                <p className="text-sm font-bold text-gray-900" suppressHydrationWarning>{statementCount} Available</p>
               </div>
             </div>
           </div>
@@ -153,13 +174,16 @@ export default function Billing() {
                           <span className="px-2.5 py-1 rounded bg-[#E5EDFF] text-[#003B95] text-[0.65rem] font-bold uppercase tracking-wider">{invoice.status || 'Paid'}</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 font-bold text-gray-900">${parseFloat(invoice.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                      <td className="px-6 py-4 font-bold text-gray-900">₱{parseFloat(invoice.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                       <td className="px-6 py-4 flex items-center justify-end gap-6">
                         <button className={`flex items-center gap-2 font-bold text-xs ${isDue ? 'text-[#003B95] hover:underline' : 'text-gray-400 hover:text-gray-600'}`}>
                           <span className="material-symbols-outlined text-[1rem]">picture_as_pdf</span> Download statement PDF
                         </button>
                         {isDue ? (
-                          <button className="bg-[#003B95] text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-[#002D7A] transition-colors w-[100px]">
+                          <button 
+                            onClick={() => toast.success(`Processing payment for Invoice #${invoice.id}`)}
+                            className="bg-[#003B95] text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-[#002D7A] transition-colors w-[100px]"
+                          >
                             Pay Now
                           </button>
                         ) : (

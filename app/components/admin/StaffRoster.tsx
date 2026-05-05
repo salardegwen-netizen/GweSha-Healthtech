@@ -93,7 +93,7 @@ export default function StaffRoster() {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      let imageUrl = `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 70) + 1}.jpg`;
+      let imageUrl = `https://avatar.iran.liara.run/public/doctor?username=${s.id}`;
       if (s.profile_image) {
         imageUrl = s.profile_image.startsWith('http') ? s.profile_image : `http://localhost:8000/${s.profile_image}`;
       }
@@ -226,7 +226,7 @@ export default function StaffRoster() {
         dept: data.department || form.dept,
         status: formatStatus(data.status || "active"),
         statusColor: getStatusColor(data.status || "active"),
-        img: imageUrl || `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 70) + 1}.jpg`,
+        img: imageUrl || `https://avatar.iran.liara.run/public/doctor?username=${data.id}`,
         email: data.email,
         phone: data.phone,
       };
@@ -412,7 +412,14 @@ export default function StaffRoster() {
         {filteredStaff.map((staff) => (
           <Card key={staff.id} className="bg-white rounded-[1.5rem] shadow-sm border border-gray-100 flex flex-col overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-6 flex items-start gap-4">
-              <img src={staff.img} alt={staff.name} className="w-16 h-16 rounded-full border-2 border-gray-100 object-cover" />
+              <img 
+                src={staff.img} 
+                alt={staff.name} 
+                className="w-16 h-16 rounded-full border-2 border-gray-100 object-cover" 
+                onError={(e) => {
+                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(staff.name)}&background=003B95&color=fff`;
+                }}
+              />
               <div className="flex-1">
                 <Badge variant="secondary" className={`inline-flex px-2 py-0.5 rounded-sm text-[0.5625rem] font-extrabold tracking-widest uppercase border-none mb-2 ${staff.statusColor}`}>
                   {staff.status}

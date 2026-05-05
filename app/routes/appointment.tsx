@@ -153,9 +153,12 @@ export default function Appointments() {
                   <div className="flex gap-4">
                     <div className="relative">
                       <img
-                        src={`https://randomuser.me/api/portraits/${i % 2 === 0 ? 'women' : 'men'}/${(doc.id % 70) + 1}.jpg`}
+                        src={`https://avatar.iran.liara.run/public/doctor?username=${doc.id}`}
                         alt={doc.name}
-                        className="w-14 h-14 rounded-lg object-cover bg-teal-100"
+                        className="w-14 h-14 rounded-lg object-cover bg-blue-50/50"
+                        onError={(e) => {
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(doc.name || 'Dr')}&background=003B95&color=fff`;
+                        }}
                       />
                       <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${doc.status === 'active' ? 'bg-green-500' : 'bg-orange-400'}`}></div>
                     </div>
