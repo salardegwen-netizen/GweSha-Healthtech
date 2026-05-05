@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { Card } from "~/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { Badge } from "~/components/ui/badge";
@@ -38,17 +38,27 @@ type Patient = {
 
 export default function PatientTable() {
   const navigate = useNavigate();
-  const { patients: rawPatients, loading } = useData();
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+
+  const { patients: rawPatients, loading, refreshData } = useData();
   const [patientsList, setPatientsList] = useState<Patient[]>([]);
   const [filteredList, setFilteredList] = useState<Patient[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+  
+  // Update search term when URL params change
+  useEffect(() => {
+    if (initialSearch) {
+      setSearchTerm(initialSearch);
+    }
+  }, [initialSearch]);
   const [isOpen, setIsOpen] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", balance: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", balance: "" });
   const [detailPatient, setDetailPatient] = useState<Patient | null>(null);
   const [detailTab, setDetailTab] = useState<"overview" | "records" | "appointments" | "billing">("overview");
   const [editPatient, setEditPatient] = useState<Patient | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", email: "", balance: "" });
+  const [editForm, setEditForm] = useState({ name: "", email: "", phone: "", balance: "" });
 
   // Transform centralized patients data whenever it updates
   useEffect(() => {
@@ -64,7 +74,6 @@ export default function PatientTable() {
       img: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 70) + 1}.jpg`,
     }));
     setPatientsList(patients);
-    setSearchTerm(""); // Reset search when data changes
   }, [rawPatients]);
 
   // Filter patients based on search term
@@ -81,8 +90,8 @@ export default function PatientTable() {
   }, [patientsList, searchTerm]);
 
   const handleAddPatient = async () => {
-    if (!form.name || !form.email) {
-      toast.error("Name and Email are required.");
+    if (!form.name || !form.email || !form.phone) {
+      toast.error("Name, Email, and Phone are required.");
       return;
     }
 
@@ -93,6 +102,7 @@ export default function PatientTable() {
         first_name: firstName,
         last_name: lastNameParts.join(' ') || 'Patient',
         email: form.email,
+        phone: form.phone,
         balance: parseFloat(form.balance) || 0,
       });
 
@@ -108,12 +118,12 @@ export default function PatientTable() {
         img: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 70) + 1}.jpg`,
       };
 
-      setPatientsList([newPatient, ...patientsList]);
+      await refreshData();
       setIsOpen(false);
-      setForm({ name: "", email: "", balance: "" });
-      toast.success(`Patient record created for ${form.name}.`);
+      setForm({ name: "", email: "", phone: "", balance: "" });
+      toast.success(`Patient record created permanently for ${form.name}.`);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to create patient');
+      // Errors handled by API interceptor
     } finally {
       setProcessing(false);
     }
@@ -125,7 +135,7 @@ export default function PatientTable() {
       await api.patients.update(p.id, {
         balance: 0,
       });
-      setPatientsList(prev => prev.map(x => x.id === p.id ? { ...x, status: "Up to Date", statusColor: "bg-green-100 text-green-800", balance: 0 } : x));
+      await refreshData();
       toast.success(`${p.name}'s record marked as resolved.`);
     } catch (err) {
       toast.error('Failed to resolve patient');
@@ -138,8 +148,8 @@ export default function PatientTable() {
     try {
       setProcessing(true);
       await api.patients.delete(p.id);
-      setPatientsList(prev => prev.filter(x => x.id !== p.id));
-      toast(`${p.name} removed from directory.`, { icon: "🗑️" });
+      await refreshData();
+      toast(`${p.name} removed from directory permanently.`, { icon: "🗑️" });
     } catch (err) {
       toast.error('Failed to delete patient');
     } finally {
@@ -152,13 +162,14 @@ export default function PatientTable() {
     setEditForm({
       name: p.name || `${p.first_name} ${p.last_name}`,
       email: p.email,
+      phone: p.phone || "",
       balance: String(p.balance),
     });
   };
 
   const handleEditPatient = async () => {
-    if (!editForm.name || !editForm.email) {
-      toast.error("Name and Email are required.");
+    if (!editForm.name || !editForm.email || !editForm.phone) {
+      toast.error("Name, Email, and Phone are required.");
       return;
     }
     if (!editPatient) return;
@@ -170,25 +181,15 @@ export default function PatientTable() {
         first_name: firstName,
         last_name: lastNameParts.join(' ') || 'Patient',
         email: editForm.email,
+        phone: editForm.phone,
         balance: parseFloat(editForm.balance) || 0,
       });
 
-      setPatientsList(prev => prev.map(p =>
-        p.id === editPatient.id
-          ? {
-              ...p,
-              name: editForm.name,
-              email: editForm.email,
-              balance: parseFloat(editForm.balance) || 0,
-              status: parseFloat(editForm.balance) > 0 ? "Action Required" : "Up to Date",
-              statusColor: parseFloat(editForm.balance) > 0 ? "bg-amber-100 text-amber-800" : "bg-green-100 text-green-800",
-            }
-          : p
-      ));
+      await refreshData();
       setEditPatient(null);
       toast.success(`Patient record updated for ${editForm.name}.`);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to update patient');
+      // Errors handled by API interceptor
     } finally {
       setProcessing(false);
     }
@@ -210,12 +211,12 @@ export default function PatientTable() {
         <h3 className="font-bold text-gray-900 text-sm font-[var(--font-headline)]">Recent Patients Overview</h3>
         <div className="flex items-center gap-3">
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger className="bg-[#00605A] hover:bg-[#004f4a] text-white h-auto py-1.5 px-3 rounded-lg text-xs font-bold shadow-sm">
+            <DialogTrigger className="bg-[#003B95] hover:bg-[#002D73] text-white h-auto py-1.5 px-3 rounded-lg text-xs font-bold shadow-sm">
               Add New Patient
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] rounded-2xl p-6">
               <DialogHeader>
-                <DialogTitle className="font-[var(--font-headline)] text-xl text-[#00605A] font-extrabold">Patient Intake</DialogTitle>
+                <DialogTitle className="font-[var(--font-headline)] text-xl text-[#003B95] font-extrabold">Patient Intake</DialogTitle>
                 <DialogDescription className="text-sm">Register a new patient into the directory database.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
@@ -228,24 +229,22 @@ export default function PatientTable() {
                   <Input id="email" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="e.g. john@example.com" className="rounded-lg" />
                 </div>
                 <div className="grid gap-2">
+                  <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-gray-500">Phone Number</Label>
+                  <Input id="phone" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="e.g. +1 234 567 890" className="rounded-lg" />
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="balance" className="text-xs font-bold uppercase tracking-wider text-gray-500">Initial Balance</Label>
                   <Input id="balance" value={form.balance} onChange={e => setForm({...form, balance: e.target.value})} placeholder="e.g. 150.00" className="rounded-lg" />
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsOpen(false)} className="rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>Cancel</Button>
-                <Button onClick={handleAddPatient} className="bg-[#00605A] hover:bg-[#004f4a] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Saving...' : 'Save Patient Data'}</Button>
+                <Button onClick={handleAddPatient} className="bg-[#003B95] hover:bg-[#002D73] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Saving...' : 'Save Patient Data'}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
-          <Button
-            onClick={() => navigate("/admin/patients")}
-            variant="ghost"
-            className="h-auto py-1 px-2 text-xs font-bold text-[#00605A] flex items-center gap-1 hover:bg-[#EAF8F8] transition-colors rounded-lg"
-          >
-            View Register <span className="material-symbols-outlined text-xs">arrow_forward</span>
-          </Button>
+
         </div>
       </div>
 
@@ -286,7 +285,7 @@ export default function PatientTable() {
                   <div className="text-[0.625rem] text-gray-500 mt-0.5">Last Visit: {p.lastVisit || p.last_visit}</div>
                 </TableCell>
                 <TableCell className="px-5 py-3">
-                  <div className={`text-xs font-bold ${(p.balance === 0 || p.balance === "$0.00") ? "text-gray-400" : "text-gray-900"}`}>${typeof p.balance === 'number' ? p.balance.toFixed(2) : p.balance}</div>
+                  <div className={`text-xs font-bold ${(p.balance === 0 || p.balance === "₱0.00") ? "text-gray-400" : "text-gray-900"}`}>₱{typeof p.balance === 'number' ? p.balance.toFixed(2) : p.balance}</div>
                 </TableCell>
                 <TableCell className="px-5 py-3">
                   <Badge variant="secondary" className={`inline-flex px-2.5 py-0.5 rounded-full text-[0.625rem] font-bold tracking-wider uppercase border-none hover:bg-opacity-80 ${p.statusColor}`}>
@@ -295,7 +294,7 @@ export default function PatientTable() {
                 </TableCell>
                 <TableCell className="px-5 py-3 text-right">
                   <DropdownMenu>
-                    <DropdownMenuTrigger className="w-7 h-7 rounded-full text-gray-400 hover:text-[#00605A] hover:bg-[#EAF8F8] transition-colors ml-auto hover:bg-muted p-0 inline-flex items-center justify-center" disabled={processing}>
+                    <DropdownMenuTrigger className="w-7 h-7 rounded-full text-gray-400 hover:text-[#003B95] hover:bg-[#E8EFFF] transition-colors ml-auto hover:bg-muted p-0 inline-flex items-center justify-center" disabled={processing}>
                       <span className="material-symbols-outlined text-[1.125rem]">more_vert</span>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 rounded-xl p-1.5 shadow-sm border-gray-100">
@@ -319,6 +318,13 @@ export default function PatientTable() {
                       >
                         <span className="material-symbols-outlined text-[1rem] mr-2">calendar_month</span>
                         Schedule Appointment
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/admin/billing")}
+                        className="text-xs font-bold text-gray-700 cursor-pointer rounded-lg"
+                      >
+                        <span className="material-symbols-outlined text-[1rem] mr-2">payments</span>
+                        Manage Billing
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -374,7 +380,7 @@ export default function PatientTable() {
                     onClick={() => setDetailTab(tab)}
                     className={`py-3 px-1 font-semibold text-sm border-b-2 transition-colors ${
                       detailTab === tab
-                        ? 'text-[#00605A] border-[#00605A]'
+                        ? 'text-[#003B95] border-[#003B95]'
                         : 'text-gray-500 border-transparent hover:text-gray-700'
                     }`}
                   >
@@ -393,8 +399,12 @@ export default function PatientTable() {
                       <div className="text-xs text-gray-700">{detailPatient.email}</div>
                     </div>
                     <div>
+                      <div className="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest mb-1">Phone Number</div>
+                      <div className="text-xs text-gray-700">{detailPatient.phone || "Not provided"}</div>
+                    </div>
+                    <div>
                       <div className="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest mb-1">Outstanding Balance</div>
-                      <div className={`text-xs font-bold ${(detailPatient.balance === 0 || detailPatient.balance === "$0.00") ? "text-gray-400" : "text-red-600"}`}>${typeof detailPatient.balance === 'number' ? detailPatient.balance.toFixed(2) : detailPatient.balance}</div>
+                      <div className={`text-xs font-bold ${(detailPatient.balance === 0 || detailPatient.balance === "₱0.00") ? "text-gray-400" : "text-red-600"}`}>₱{typeof detailPatient.balance === 'number' ? detailPatient.balance.toFixed(2) : detailPatient.balance}</div>
                     </div>
                     <div>
                       <div className="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest mb-1">Last Visit</div>
@@ -433,7 +443,7 @@ export default function PatientTable() {
               {/* Footer */}
               <div className="px-6 pb-6 flex gap-3 border-t border-gray-200 pt-4 flex-shrink-0">
                 <Button onClick={() => { navigate("/admin/schedule"); setDetailPatient(null); }} variant="outline" className="flex-1 rounded-xl text-xs font-bold h-auto py-2.5">Schedule Appt</Button>
-                <Button onClick={() => setDetailPatient(null)} className="flex-1 rounded-xl bg-[#00605A] hover:bg-[#004f4a] text-white font-bold text-xs h-auto py-2.5">Close</Button>
+                <Button onClick={() => setDetailPatient(null)} className="flex-1 rounded-xl bg-[#003B95] hover:bg-[#002D73] text-white font-bold text-xs h-auto py-2.5">Close</Button>
               </div>
             </>
           )}
@@ -446,7 +456,7 @@ export default function PatientTable() {
           {editPatient && (
             <>
               <DialogHeader>
-                <DialogTitle className="font-[var(--font-headline)] text-xl text-[#00605A] font-extrabold">Edit Patient Record</DialogTitle>
+                <DialogTitle className="font-[var(--font-headline)] text-xl text-[#003B95] font-extrabold">Edit Patient Record</DialogTitle>
                 <DialogDescription className="text-sm">Update patient information and billing details.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
@@ -459,13 +469,17 @@ export default function PatientTable() {
                   <Input id="edit-email" type="email" value={editForm.email} onChange={e => setEditForm({...editForm, email: e.target.value})} placeholder="e.g. john@example.com" className="rounded-lg" />
                 </div>
                 <div className="grid gap-2">
+                  <Label htmlFor="edit-phone" className="text-xs font-bold uppercase tracking-wider text-gray-500">Phone Number</Label>
+                  <Input id="edit-phone" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} placeholder="e.g. +1 234 567 890" className="rounded-lg" />
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="edit-balance" className="text-xs font-bold uppercase tracking-wider text-gray-500">Outstanding Balance</Label>
                   <Input id="edit-balance" value={editForm.balance} onChange={e => setEditForm({...editForm, balance: e.target.value})} placeholder="e.g. 150.00" className="rounded-lg" />
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setEditPatient(null)} className="rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>Cancel</Button>
-                <Button onClick={handleEditPatient} className="bg-[#00605A] hover:bg-[#004f4a] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Saving...' : 'Save Changes'}</Button>
+                <Button onClick={handleEditPatient} className="bg-[#003B95] hover:bg-[#002D73] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Saving...' : 'Save Changes'}</Button>
               </DialogFooter>
             </>
           )}

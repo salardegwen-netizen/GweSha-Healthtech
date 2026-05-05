@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 // Create axios instance
 export const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: 'http://127.0.0.1:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -45,7 +45,15 @@ apiClient.interceptors.response.use(
       } else if (!error.response) {
         toast.error('Network error. Please check your connection.');
       } else {
-        const message = (error.response.data as any)?.message || 'An error occurred';
+        const data = error.response.data as any;
+        let message = data?.message || 'An error occurred';
+        if (data?.errors) {
+          // Extract first validation error
+          const firstError = Object.values(data.errors)[0];
+          if (Array.isArray(firstError)) {
+            message = firstError[0];
+          }
+        }
         toast.error(message);
       }
     }
@@ -86,6 +94,7 @@ export const api = {
     show: (id: number) => apiClient.get(`/appointments/${id}`),
     update: (id: number, data: any) => apiClient.put(`/appointments/${id}`, data),
     delete: (id: number) => apiClient.delete(`/appointments/${id}`),
+    clearAll: () => apiClient.delete('/appointments/clear-all'),
   },
 
   // ========== INVOICES & BILLING ==========

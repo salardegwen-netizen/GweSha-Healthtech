@@ -16,33 +16,39 @@ export default function BillingCard() {
   const [totalDue, setTotalDue] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Update when invoices from DataContext change
   useEffect(() => {
-    if (rawInvoices && rawInvoices.length > 0) {
-      // Find first pending/due invoice
-      const pending = rawInvoices.find((inv: any) =>
+    if (!rawInvoices) return;
+
+    if (rawInvoices.length === 0) {
+      setInvoice(null);
+      setTotalDue(0);
+      setLoading(false);
+      return;
+    }
+
+    // Find first pending/due invoice
+    const pending = rawInvoices.find((inv: any) =>
+      (inv.status || '').toLowerCase() === 'pending' ||
+      (inv.status || '').toLowerCase() === 'due'
+    );
+    const selectedInvoice = pending || rawInvoices[0];
+
+    if (selectedInvoice) {
+      setInvoice({
+        ...selectedInvoice,
+        amount: parseFloat(selectedInvoice.amount) || 0,
+      });
+    }
+
+    // Calculate total pending
+    const total = rawInvoices
+      .filter((inv: any) =>
         (inv.status || '').toLowerCase() === 'pending' ||
         (inv.status || '').toLowerCase() === 'due'
-      );
-      const selectedInvoice = pending || rawInvoices[0];
-
-      if (selectedInvoice) {
-        setInvoice({
-          ...selectedInvoice,
-          amount: parseFloat(selectedInvoice.amount) || 0,
-        });
-      }
-
-      // Calculate total pending
-      const total = rawInvoices
-        .filter((inv: any) =>
-          (inv.status || '').toLowerCase() === 'pending' ||
-          (inv.status || '').toLowerCase() === 'due'
-        )
-        .reduce((sum: number, inv: any) => sum + (parseFloat(inv.amount) || 0), 0);
-      setTotalDue(total);
-      setLoading(false);
-    }
+      )
+      .reduce((sum: number, inv: any) => sum + (parseFloat(inv.amount) || 0), 0);
+    setTotalDue(total);
+    setLoading(false);
   }, [rawInvoices]);
 
   const formatDate = (dateStr: string) => {
@@ -52,51 +58,56 @@ export default function BillingCard() {
 
   if (loading) {
     return (
-      <div className="col-span-1 md:col-span-12 lg:col-span-7 bg-[var(--color-surface-container-low)] rounded-2xl p-6 animate-pulse">
-        <div className="h-6 bg-gray-300 rounded w-32 mb-3"></div>
-        <div className="h-20 bg-gray-300 rounded"></div>
-      </div>
-    );
-  }
-
-  if (!invoice) {
-    return (
-      <div className="col-span-1 md:col-span-12 lg:col-span-7 bg-[var(--color-surface-container-low)] rounded-2xl p-6">
-        <p className="text-[var(--color-on-surface-variant)]">No billing information available</p>
+      <div className="col-span-1 md:col-span-12 lg:col-span-4 rounded-xl border border-gray-200 p-4 animate-pulse">
+        <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
+        <div className="h-48 bg-gray-200 rounded-xl"></div>
       </div>
     );
   }
 
   return (
-    <div className="col-span-1 md:col-span-12 lg:col-span-7 bg-[var(--color-surface-container-low)] rounded-2xl p-6 flex flex-col md:flex-row gap-6 relative">
-      <Link to="/billing" className="absolute inset-0 z-0" aria-label="Go to billing" />
-      <div className="md:w-1/2 space-y-3 relative z-10 pointer-events-none">
-        <div className="bg-[var(--color-tertiary)]/10 text-[var(--color-tertiary)] px-2.5 py-1 rounded-full text-[0.625rem] font-bold inline-block">Payment Pending</div>
-        <h3 className="font-[var(--font-headline)] text-xl font-bold text-left">Billing Oversight</h3>
-        <p className="text-[var(--color-on-surface-variant)] text-sm text-left">
-          Your outstanding balance for recent services is due for processing.
-        </p>
-        <div className="flex items-center gap-2 text-xs text-gray-500 pt-1">
-          <span className="material-symbols-outlined text-[1rem]">info</span>
-          Click anywhere on this card to view your full statement.
-        </div>
+    <div className="col-span-1 md:col-span-12 lg:col-span-4 flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-bold text-gray-900 font-[var(--font-headline)]">Billing Summary</h3>
+        <span className="material-symbols-outlined text-gray-400">credit_card</span>
       </div>
-      <div className="md:w-1/2 flex flex-col justify-between gap-4 relative z-10 pointer-events-none">
-        <div className="bg-[var(--color-surface-container-lowest)] p-5 rounded-2xl flex justify-between items-center shadow-sm">
-          <div>
-            <p className="text-[0.625rem] font-bold text-[var(--color-on-surface-variant)] uppercase tracking-wider mb-0.5">Amount Due</p>
-            <p className="text-2xl font-black text-[var(--color-on-surface)]">${invoice.amount.toFixed(2)}</p>
-            <p className="text-[0.625rem] text-gray-400 mt-0.5">{invoice.id} · Due {formatDate(invoice.created_at)}</p>
+
+      <div className="bg-[#003B95] rounded-xl p-6 text-white relative overflow-hidden flex-1 shadow-md">
+        {/* Decorative circle */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
+        
+        <p className="text-[0.6875rem] font-semibold text-blue-100 mb-1 relative z-10">Current Balance Due</p>
+        <h4 className="text-4xl font-extrabold mb-8 relative z-10">₱{totalDue > 0 ? totalDue.toFixed(2) : "0.00"}</h4>
+        
+        <div className="space-y-3 mb-6 relative z-10">
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-blue-100">Recent Copay</span>
+            <span className="font-bold">₱2,500</span>
           </div>
-          <span className="material-symbols-outlined text-[var(--color-tertiary)] text-[2rem]">account_balance_wallet</span>
+          <div className="h-px w-full bg-white/20"></div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-blue-100">Last Statement</span>
+            <span className="font-bold">Oct 01</span>
+          </div>
         </div>
+        
         <button
-          onClick={(e) => { e.stopPropagation(); navigate("/billing"); }}
-          className="w-full bg-[var(--color-on-surface)] text-[var(--color-surface)] py-3 rounded-xl font-semibold text-sm hover:bg-[var(--color-inverse-surface)] transition-colors pointer-events-auto flex items-center justify-center gap-2"
+          onClick={() => navigate("/billing")}
+          className="w-full bg-white text-[#003B95] py-3 rounded-lg font-bold text-sm hover:bg-gray-100 transition-colors relative z-10"
         >
-          <span className="material-symbols-outlined text-[1.125rem]">payment</span>
-          Pay Statement
+          Pay Outstanding Balance
         </button>
+      </div>
+      
+      <div className="grid grid-cols-2 mt-2 gap-2">
+        <div className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-100 rounded-lg text-xs font-semibold text-gray-600 cursor-pointer hover:bg-gray-50">
+          <span className="material-symbols-outlined text-sm">receipt_long</span>
+          Statements
+        </div>
+        <div className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-100 rounded-lg text-xs font-semibold text-gray-600 cursor-pointer hover:bg-gray-50">
+          <span className="material-symbols-outlined text-sm">health_and_safety</span>
+          Insurance
+        </div>
       </div>
     </div>
   );

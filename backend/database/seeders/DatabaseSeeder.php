@@ -25,21 +25,29 @@ class DatabaseSeeder extends Seeder
         // Create demo users with different roles
         User::factory()->create([
             'name' => 'Admin User',
-            'email' => 'admin@sanctuary.com',
+            'email' => 'admin@gwesha.com',
             'password' => bcrypt('password'),
             'role' => 'admin',
         ]);
 
         User::factory()->create([
             'name' => 'Finance User',
-            'email' => 'finance@sanctuary.com',
+            'email' => 'finance@gwesha.com',
             'password' => bcrypt('password'),
             'role' => 'finance',
         ]);
 
         User::factory()->create([
             'name' => 'Patient User',
-            'email' => 'patient@sanctuary.com',
+            'email' => 'patient@gwesha.com',
+            'password' => bcrypt('password'),
+            'role' => 'patient',
+        ]);
+
+        // Add user's personal email as patient
+        User::factory()->create([
+            'name' => 'Gwen Salarde',
+            'email' => 'salardegwen@gmail.com',
             'password' => bcrypt('password'),
             'role' => 'patient',
         ]);

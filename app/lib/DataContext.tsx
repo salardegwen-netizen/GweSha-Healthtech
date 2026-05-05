@@ -6,6 +6,7 @@ type DataContextType = {
   appointments: any[];
   invoices: any[];
   staff: any[];
+  healthRecords: any[];
   notifications: any[];
   unreadNotificationCount: number;
   loading: boolean;
@@ -20,6 +21,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
   const [staff, setStaff] = useState<any[]>([]);
+  const [healthRecords, setHealthRecords] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -59,6 +61,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setStaff(staffRes.data.data || []);
       } catch (err) {
         console.error("Failed to fetch staff:", err);
+      }
+
+      try {
+        const recordsRes = await api.healthRecords.list().catch(() => ({ data: { data: [] } }));
+        setHealthRecords(recordsRes.data.data || []);
+      } catch (err) {
+        console.error("Failed to fetch health records:", err);
       }
 
       try {
@@ -105,6 +114,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     appointments,
     invoices,
     staff,
+    healthRecords,
     notifications,
     unreadNotificationCount,
     loading,

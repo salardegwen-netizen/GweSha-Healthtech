@@ -26,7 +26,14 @@ class StaffController extends Controller
                 'title',
                 'profile_image',
                 'created_at',
-            ])->get();
+            ])->get()->map(function ($member) {
+                if ($member->profile_image) {
+                    $member->profile_image = str_starts_with($member->profile_image, 'http')
+                        ? $member->profile_image
+                        : asset($member->profile_image);
+                }
+                return $member;
+            });
 
             return response()->json([
                 'success' => true,

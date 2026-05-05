@@ -106,7 +106,7 @@ export default function RecordForm({ open, onOpenChange, patientId, record, onSu
               placeholder="e.g., Blood Test, X-Ray Results"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#00605A] outline-none"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#003B95] outline-none"
               disabled={loading}
             />
           </div>
@@ -120,7 +120,7 @@ export default function RecordForm({ open, onOpenChange, patientId, record, onSu
                 id="type"
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#00605A] outline-none"
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#003B95] outline-none"
                 disabled={loading}
               >
                 {RECORD_TYPES.map((type) => (
@@ -140,7 +140,7 @@ export default function RecordForm({ open, onOpenChange, patientId, record, onSu
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#00605A] outline-none"
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#003B95] outline-none"
                 disabled={loading}
               />
             </div>
@@ -154,7 +154,7 @@ export default function RecordForm({ open, onOpenChange, patientId, record, onSu
               id="status"
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#00605A] outline-none"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#003B95] outline-none"
               disabled={loading}
             >
               {RECORD_STATUSES.map((status) => (
@@ -175,7 +175,7 @@ export default function RecordForm({ open, onOpenChange, patientId, record, onSu
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#00605A] outline-none resize-none"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#003B95] outline-none resize-none"
               disabled={loading}
             />
           </div>
@@ -192,7 +192,7 @@ export default function RecordForm({ open, onOpenChange, patientId, record, onSu
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 rounded-lg bg-[#00605A] text-white font-semibold hover:bg-[#004f4a] transition-colors flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-2.5 rounded-lg bg-[#003B95] text-white font-semibold hover:bg-[#002D73] transition-colors flex items-center gap-2 disabled:opacity-50"
             >
               {loading && <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>}
               {record ? "Update Record" : "Create Record"}

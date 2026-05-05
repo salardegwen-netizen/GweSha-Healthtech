@@ -8,14 +8,14 @@ import Footer from "~/components/Footer";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Sanctuary Health | Your Path to Restorative Care" },
+    { title: "GweSha HealthTech | Your Path to Restorative Care" },
     {
       name: "description",
       content:
         "Experience a sanctuary where advanced clinical expertise meets the warmth of intentional hospitality. Schedule your consultation today.",
     },
     { name: "keywords", content: "restorative care, health clinic, wellness, specialists, patient portal" },
-    { property: "og:title", content: "Sanctuary Health | Your Path to Restorative Care" },
+    { property: "og:title", content: "GweSha HealthTech | Your Path to Restorative Care" },
     { property: "og:description", content: "Advanced clinical expertise meets intentional hospitality." },
     { property: "og:type", content: "website" },
   ];

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -40,6 +41,23 @@ class AuthController extends Controller
             $user = Auth::user();
             $token = $user->createToken('api_token')->plainTextToken;
 
+            // Find or create associated patient if role is patient
+            $patientId = null;
+            if ($user->role === 'patient') {
+                $patient = Patient::where('user_id', $user->id)->first();
+                if (!$patient) {
+                    $nameParts = explode(' ', $user->name);
+                    $patient = Patient::create([
+                        'user_id' => $user->id,
+                        'first_name' => $nameParts[0],
+                        'last_name' => isset($nameParts[1]) ? $nameParts[1] : '',
+                        'email' => $user->email,
+                        'status' => 'active',
+                    ]);
+                }
+                $patientId = $patient->id;
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -48,6 +66,7 @@ class AuthController extends Controller
                         'name' => $user->name,
                         'email' => $user->email,
                         'role' => $user->role,
+                        'patient_id' => $patientId,
                     ],
                     'token' => $token,
                 ],
@@ -90,6 +109,23 @@ class AuthController extends Controller
                 'role' => $request->role,
             ]);
 
+            // Create patient record if role is patient
+            $patientId = null;
+            if ($user->role === 'patient') {
+                $nameParts = explode(' ', $user->name);
+                $firstName = $nameParts[0];
+                $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
+
+                $patient = Patient::create([
+                    'user_id' => $user->id,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'email' => $user->email,
+                    'status' => 'active',
+                ]);
+                $patientId = $patient->id;
+            }
+
             $token = $user->createToken('api_token')->plainTextToken;
 
             return response()->json([
@@ -100,6 +136,7 @@ class AuthController extends Controller
                         'name' => $user->name,
                         'email' => $user->email,
                         'role' => $user->role,
+                        'patient_id' => $patientId,
                     ],
                     'token' => $token,
                 ],
@@ -129,6 +166,23 @@ class AuthController extends Controller
                 ], 401);
             }
 
+            // Find or create associated patient if role is patient
+            $patientId = null;
+            if ($user->role === 'patient') {
+                $patient = Patient::where('user_id', $user->id)->first();
+                if (!$patient) {
+                    $nameParts = explode(' ', $user->name);
+                    $patient = Patient::create([
+                        'user_id' => $user->id,
+                        'first_name' => $nameParts[0],
+                        'last_name' => isset($nameParts[1]) ? $nameParts[1] : '',
+                        'email' => $user->email,
+                        'status' => 'active',
+                    ]);
+                }
+                $patientId = $patient->id;
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -136,6 +190,7 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'patient_id' => $patientId,
                 ],
                 'message' => 'User retrieved successfully',
             ], 200);

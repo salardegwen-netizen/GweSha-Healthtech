@@ -6,8 +6,8 @@ import { toast } from "sonner";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Register Account | Sanctuary Health" },
-    { name: "description", content: "Create your Sanctuary Health patient portal account." },
+    { title: "Register Account | GweSha HealthTech" },
+    { name: "description", content: "Create your GweSha HealthTech patient portal account." },
   ];
 }
 
@@ -97,7 +97,7 @@ export default function Register() {
             className="flex justify-center text-2xl font-bold tracking-tight mb-2"
             style={{ color: "var(--color-primary)", fontFamily: "var(--font-headline)" }}
           >
-            Sanctuary Health
+            GweSha HealthTech
           </Link>
           <h2 className="text-center text-2xl font-bold tracking-tight" style={{ color: "var(--color-on-surface)" }}>
             Create an Account

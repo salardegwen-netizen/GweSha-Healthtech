@@ -301,7 +301,7 @@ export default function StaffRoster() {
 
   return (
     <div className="mt-8 relative mb-12">
-      <Badge className="absolute -top-3 left-6 z-10 bg-[#00605A] text-white hover:bg-[#00605A] border-none px-4 shadow-md font-bold uppercase tracking-wider text-[0.6875rem]">Staff Directory</Badge>
+      <Badge className="absolute -top-3 left-6 z-10 bg-[#003B95] text-white hover:bg-[#003B95] border-none px-4 shadow-md font-bold uppercase tracking-wider text-[0.6875rem]">Staff Directory</Badge>
 
       <div className="flex justify-end items-center mb-6 pt-4">
         <Dialog open={isAddOpen} onOpenChange={(open) => {
@@ -312,12 +312,12 @@ export default function StaffRoster() {
             setImagePreview(null);
           }
         }}>
-          <DialogTrigger className="bg-[#00605A] hover:bg-[#004f4a] text-white rounded-lg font-bold text-xs py-1.5 px-4 h-auto disabled:opacity-60" disabled={processing}>
+          <DialogTrigger className="bg-[#003B95] hover:bg-[#002D73] text-white rounded-lg font-bold text-xs py-1.5 px-4 h-auto disabled:opacity-60" disabled={processing}>
             Add New Member
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] rounded-2xl p-6">
             <DialogHeader>
-              <DialogTitle className="font-[var(--font-headline)] text-xl text-[#00605A] font-extrabold">Register Staff Member</DialogTitle>
+              <DialogTitle className="font-[var(--font-headline)] text-xl text-[#003B95] font-extrabold">Register Staff Member</DialogTitle>
               <DialogDescription className="text-sm">Add a new professional to the clinic portal.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -325,7 +325,7 @@ export default function StaffRoster() {
                 <Label htmlFor="image" className="text-xs font-bold uppercase tracking-wider text-gray-500">Staff Photo (Optional)</Label>
                 <div className="flex items-center gap-3">
                   {imagePreview ? (
-                    <img src={imagePreview} alt="Preview" className="w-16 h-16 rounded-full object-cover border-2 border-[#00605A]" />
+                    <img src={imagePreview} alt="Preview" className="w-16 h-16 rounded-full object-cover border-2 border-[#003B95]" />
                   ) : (
                     <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
                       <span className="material-symbols-outlined text-gray-400">account_circle</span>
@@ -340,7 +340,7 @@ export default function StaffRoster() {
                       className="hidden"
                       disabled={processing}
                     />
-                    <div className="px-4 py-2 bg-[#EAF8F8] text-[#00605A] rounded-lg font-bold text-xs text-center hover:bg-[#D0F0ED] transition-colors">
+                    <div className="px-4 py-2 bg-[#E8EFFF] text-[#003B95] rounded-lg font-bold text-xs text-center hover:bg-[#D0F0ED] transition-colors">
                       {imageFile ? 'Change Photo' : 'Choose Photo'}
                     </div>
                   </label>
@@ -360,7 +360,7 @@ export default function StaffRoster() {
                   id="role"
                   value={form.role}
                   onChange={e => setForm({...form, role: e.target.value})}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#00605A]"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95]"
                 >
                   <option value="">Select a role...</option>
                   {ROLE_OPTIONS.map(role => (
@@ -374,7 +374,7 @@ export default function StaffRoster() {
                   id="dept"
                   value={form.dept}
                   onChange={e => setForm({...form, dept: e.target.value})}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#00605A]"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95]"
                 >
                   <option value="">Select a department...</option>
                   {DEPARTMENT_OPTIONS.map(dept => (
@@ -393,7 +393,7 @@ export default function StaffRoster() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAddOpen(false)} className="rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>Cancel</Button>
-              <Button onClick={handleAddMember} className="bg-[#00605A] hover:bg-[#004f4a] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Adding...' : 'Deploy Member'}</Button>
+              <Button onClick={handleAddMember} className="bg-[#003B95] hover:bg-[#002D73] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Adding...' : 'Deploy Member'}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -419,7 +419,7 @@ export default function StaffRoster() {
                 </Badge>
                 <div className="font-extrabold text-sm text-gray-900 mb-0.5">{staff.name}</div>
                 {staff.email && (
-                  <div className="text-[0.6875rem] text-[#00605A] font-semibold mb-1">{staff.email}</div>
+                  <div className="text-[0.6875rem] text-[#003B95] font-semibold mb-1">{staff.email}</div>
                 )}
                 <div className="text-[0.6875rem] font-bold text-gray-600 mb-1">{staff.dept || staff.department}</div>
                 <div className="text-xs text-gray-500 font-medium">{staff.role}</div>
@@ -432,7 +432,7 @@ export default function StaffRoster() {
                   onClick={() => setViewProfile(staff)}
                   variant="ghost"
                   size="sm"
-                  className="h-auto py-1 px-2 text-[0.6875rem] font-bold text-gray-600 hover:text-[#00605A] rounded-md"
+                  className="h-auto py-1 px-2 text-[0.6875rem] font-bold text-gray-600 hover:text-[#003B95] rounded-md"
                 >
                   View Profile
                 </Button>
@@ -494,7 +494,7 @@ export default function StaffRoster() {
                         key={opt.label}
                         onClick={() => handleStatusChange(opt.label, opt.color)}
                         disabled={processing}
-                        className={`px-3 py-1 rounded-full text-[0.625rem] font-extrabold uppercase tracking-wider border-2 transition-all ${viewProfile.status === opt.label ? "border-[#00605A] scale-105" : "border-transparent"} ${opt.color}`}
+                        className={`px-3 py-1 rounded-full text-[0.625rem] font-extrabold uppercase tracking-wider border-2 transition-all ${viewProfile.status === opt.label ? "border-[#003B95] scale-105" : "border-transparent"} ${opt.color}`}
                       >
                         {opt.label}
                       </button>
@@ -512,7 +512,7 @@ export default function StaffRoster() {
                 </Button>
                 <Button
                   onClick={() => setViewProfile(null)}
-                  className="flex-1 rounded-xl bg-[#00605A] hover:bg-[#004f4a] text-white font-bold text-xs h-auto py-2.5"
+                  className="flex-1 rounded-xl bg-[#003B95] hover:bg-[#002D73] text-white font-bold text-xs h-auto py-2.5"
                   disabled={processing}
                 >
                   Close

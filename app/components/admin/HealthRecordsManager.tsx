@@ -104,7 +104,7 @@ export default function HealthRecordsManager({ patientId, onRefresh }: HealthRec
             setEditingRecord(null);
             setFormOpen(true);
           }}
-          className="px-4 py-2 bg-[#00605A] text-white rounded-lg text-sm font-semibold hover:bg-[#004f4a] flex items-center gap-2"
+          className="px-4 py-2 bg-[#003B95] text-white rounded-lg text-sm font-semibold hover:bg-[#002D73] flex items-center gap-2"
         >
           <span className="material-symbols-outlined text-lg">add</span>
           Add Record
@@ -113,8 +113,8 @@ export default function HealthRecordsManager({ patientId, onRefresh }: HealthRec
 
       {loading ? (
         <div className="text-center py-8">
-          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#00605A]/10 mb-2">
-            <span className="material-symbols-outlined text-[#00605A] animate-spin">autorenew</span>
+          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#003B95]/10 mb-2">
+            <span className="material-symbols-outlined text-[#003B95] animate-spin">autorenew</span>
           </div>
           <p className="text-gray-600 text-sm">Loading health records...</p>
         </div>
@@ -129,7 +129,7 @@ export default function HealthRecordsManager({ patientId, onRefresh }: HealthRec
           {records.map((record) => (
             <div key={record.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors">
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-lg bg-[#EAF8F8] flex items-center justify-center text-[#00605A] flex-shrink-0">
+                <div className="w-12 h-12 rounded-lg bg-[#E8EFFF] flex items-center justify-center text-[#003B95] flex-shrink-0">
                   <span className="material-symbols-outlined text-xl">{getIcon(record.type)}</span>
                 </div>
 
@@ -163,7 +163,7 @@ export default function HealthRecordsManager({ patientId, onRefresh }: HealthRec
                         setEditingRecord(record);
                         setFormOpen(true);
                       }}
-                      className="text-xs font-semibold text-[#00605A] hover:underline flex items-center gap-1"
+                      className="text-xs font-semibold text-[#003B95] hover:underline flex items-center gap-1"
                     >
                       <span className="material-symbols-outlined text-sm">edit</span>
                       Edit

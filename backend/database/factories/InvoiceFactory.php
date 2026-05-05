@@ -24,7 +24,16 @@ class InvoiceFactory extends Factory
             'amount' => $this->faker->numberBetween(50, 5000) / 100,
             'date' => $this->faker->dateTimeBetween('-6 months', 'now')->format('Y-m-d'),
             'status' => $this->faker->randomElement(['Paid', 'Pending', 'Overdue']),
-            'description' => $this->faker->sentence(),
+            'description' => $this->faker->randomElement([
+                'Consultation with specialist',
+                'General health checkup',
+                'Laboratory diagnostics',
+                'Follow-up visit',
+                'Diagnostic imaging services',
+                'Vaccination and immunization',
+                'Post-operative review',
+                'Preventive screening'
+            ]),
         ];
     }
 }

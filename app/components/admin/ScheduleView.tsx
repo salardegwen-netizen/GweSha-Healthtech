@@ -84,12 +84,20 @@ export default function ScheduleView() {
 
     try {
       setProcessing(true);
+      
+      const [timeStr, modifier] = form.time.split(' ');
+      let [hours, minutes] = (timeStr || "00:00").split(':');
+      if (hours === '12') hours = '00';
+      if (modifier === 'PM' || modifier === 'pm') hours = (parseInt(hours, 10) + 12).toString();
+      const formattedTime = `${hours.padStart(2, '0')}:${minutes || '00'}:00`;
+      const date_time = `${new Date().toISOString().split('T')[0]} ${formattedTime}`;
+
       const { data } = await api.appointments.create({
-        date: new Date().toISOString().split('T')[0],
-        time: form.time,
-        patient_name: form.patient,
+        patient_id: 1, // Defaulting to 1 for demonstration
+        doctor_id: 1,  // Defaulting to 1 for demonstration
+        date_time: date_time,
         procedure: form.procedure,
-        doctor_name: form.doctor,
+        length: 30,
         status: "Scheduled",
       });
 
@@ -179,7 +187,7 @@ export default function ScheduleView() {
 
   return (
     <div className="mt-8 relative mb-12">
-      <Badge className="absolute -top-3 left-6 z-10 bg-[#00605A] text-white hover:bg-[#00605A] border-none px-4 shadow-md font-bold uppercase tracking-wider text-[0.6875rem]">Clinical Schedule</Badge>
+      <Badge className="absolute -top-3 left-6 z-10 bg-[#003B95] text-white hover:bg-[#003B95] border-none px-4 shadow-md font-bold uppercase tracking-wider text-[0.6875rem]">Clinical Schedule</Badge>
       <Card className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
           <div className="flex gap-4 items-center">
@@ -189,7 +197,7 @@ export default function ScheduleView() {
                 <button
                   key={f}
                   onClick={() => setActiveFilter(f)}
-                  className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${activeFilter === f ? "text-white bg-[#00605A] shadow-sm" : "text-gray-500 hover:text-gray-900"}`}
+                  className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${activeFilter === f ? "text-white bg-[#003B95] shadow-sm" : "text-gray-500 hover:text-gray-900"}`}
                 >
                   {f}
                 </button>
@@ -199,12 +207,12 @@ export default function ScheduleView() {
           </div>
 
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger className="h-auto py-1 px-3 text-xs font-bold text-[#00605A] flex items-center gap-1 hover:bg-gray-100/50 rounded-lg transition-colors disabled:opacity-60" disabled={processing}>
+            <DialogTrigger className="h-auto py-1 px-3 text-xs font-bold text-[#003B95] flex items-center gap-1 hover:bg-gray-100/50 rounded-lg transition-colors disabled:opacity-60" disabled={processing}>
               <span className="material-symbols-outlined text-[1.125rem]">add</span> New Block
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] rounded-2xl p-6">
               <DialogHeader>
-                <DialogTitle className="font-[var(--font-headline)] text-xl text-[#00605A] font-extrabold">Schedule Appointment</DialogTitle>
+                <DialogTitle className="font-[var(--font-headline)] text-xl text-[#003B95] font-extrabold">Schedule Appointment</DialogTitle>
                 <DialogDescription className="text-sm">Adding to <strong>{activeFilter}</strong>'s schedule.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
@@ -227,7 +235,7 @@ export default function ScheduleView() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsAddOpen(false)} className="rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>Cancel</Button>
-                <Button onClick={handleAddBlock} className="bg-[#00605A] hover:bg-[#004f4a] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Saving...' : 'Save Schedule'}</Button>
+                <Button onClick={handleAddBlock} className="bg-[#003B95] hover:bg-[#002D73] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Saving...' : 'Save Schedule'}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -243,7 +251,7 @@ export default function ScheduleView() {
           ) : (
             <div className="divide-y divide-gray-50">
               {filteredList.map((item, idx) => (
-                <div key={item.id || idx} className="flex border-l-4 border-transparent hover:border-[#00605A] hover:bg-gray-50/50 transition-all p-5">
+                <div key={item.id || idx} className="flex border-l-4 border-transparent hover:border-[#003B95] hover:bg-gray-50/50 transition-all p-5">
                   <div className="w-24 shrink-0 pr-4 border-r border-gray-100 flex flex-col justify-center text-right">
                     <div className="text-sm font-bold text-gray-900">{item.time}</div>
                     <div className="text-[0.6875rem] text-gray-400 font-medium">{item.length}</div>
@@ -263,7 +271,7 @@ export default function ScheduleView() {
                       onClick={() => openEdit(item, idx)}
                       variant="ghost"
                       size="icon"
-                      className="w-8 h-8 rounded-full text-gray-400 hover:text-[#00605A]"
+                      className="w-8 h-8 rounded-full text-gray-400 hover:text-[#003B95]"
                       disabled={processing}
                     >
                       <span className="material-symbols-outlined text-[1.25rem]">edit</span>
@@ -280,7 +288,7 @@ export default function ScheduleView() {
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
         <DialogContent className="sm:max-w-[425px] rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="font-[var(--font-headline)] text-xl text-[#00605A] font-extrabold">Edit Appointment</DialogTitle>
+            <DialogTitle className="font-[var(--font-headline)] text-xl text-[#003B95] font-extrabold">Edit Appointment</DialogTitle>
             <DialogDescription className="text-sm">Update the appointment details below.</DialogDescription>
           </DialogHeader>
           {editItem && (
@@ -308,7 +316,7 @@ export default function ScheduleView() {
                     <button
                       key={opt.label}
                       onClick={() => setEditItem({...editItem, status: opt.label, statusColor: opt.color})}
-                      className={`px-3 py-1 rounded-full text-[0.625rem] font-extrabold uppercase tracking-wider border-2 transition-all ${editItem.status === opt.label ? "border-[#00605A]" : "border-transparent"} ${opt.color}`}
+                      className={`px-3 py-1 rounded-full text-[0.625rem] font-extrabold uppercase tracking-wider border-2 transition-all ${editItem.status === opt.label ? "border-[#003B95]" : "border-transparent"} ${opt.color}`}
                     >
                       {opt.label}
                     </button>
@@ -320,7 +328,7 @@ export default function ScheduleView() {
           <DialogFooter>
             <Button variant="outline" onClick={handleDeleteAppointment} className="rounded-lg h-auto py-2 font-bold text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100" disabled={processing}>Delete</Button>
             <Button variant="outline" onClick={() => setEditItem(null)} className="rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>Cancel</Button>
-            <Button onClick={handleSaveEdit} className="bg-[#00605A] hover:bg-[#004f4a] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Saving...' : 'Save Changes'}</Button>
+            <Button onClick={handleSaveEdit} className="bg-[#003B95] hover:bg-[#002D73] rounded-lg h-auto py-2 font-bold text-xs" disabled={processing}>{processing ? 'Saving...' : 'Save Changes'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

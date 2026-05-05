@@ -2,11 +2,12 @@ import type { Route } from "./+types/login";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { type Role, setRole } from "~/lib/role";
+import { api } from "~/lib/api";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Sign In | Sanctuary Health" },
-    { name: "description", content: "Access your Sanctuary Health portal." },
+    { title: "Sign In | GweSha HealthTech" },
+    { name: "description", content: "Access your GweSha HealthTech portal." },
   ];
 }
 
@@ -31,8 +32,8 @@ const ROLE_TABS: RoleTab[] = [
 
 // Demo credentials per role
 const DEMO_CREDENTIALS: Record<Role, { email: string; password: string; name: string }> = {
-  patient: { email: "patient@sanctuary.com", password: "password", name: "Patient User" },
-  admin:   { email: "admin@sanctuary.com",   password: "password", name: "Admin User" },
+  patient: { email: "patient@gwesha.com", password: "password", name: "Patient User" },
+  admin:   { email: "admin@gwesha.com",   password: "password", name: "Admin User" },
 };
 
 export default function Login() {
@@ -59,14 +60,9 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // Call real backend API
-      const response = await fetch('http://localhost:8000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
+      // Call real backend API using the central apiClient
+      const response = await api.auth.login(email, password, selectedRole);
+      const data = response.data;
 
       if (data.success && data.data?.token) {
         // Store real token from backend
@@ -77,8 +73,11 @@ export default function Login() {
       } else {
         setError(data.message || "Invalid credentials. Use the demo credentials below.");
       }
-    } catch (err) {
-      setError("Network error. Please check if backend is running on port 8000.");
+    } catch (err: any) {
+      // Axios errors are handled by interceptors in api.ts, 
+      // but we still catch here to show a local state error if needed.
+      const msg = err.response?.data?.message || err.message || "Network error. Please check if backend is running on port 8000.";
+      setError(msg);
       console.error(err);
     } finally {
       setLoading(false);
@@ -103,71 +102,80 @@ export default function Login() {
         
         {/* Logo */}
         <div className="text-center">
-          <Link to="/" className="inline-block text-2xl font-bold tracking-tight mb-1" style={{ color: "var(--color-primary)", fontFamily: "var(--font-headline)" }}>
-            Sanctuary Health
-          </Link>
-          <p className="text-sm mt-1" style={{ color: "var(--color-on-surface-variant)" }}>Sign in to your portal</p>
+          <div className="mx-auto w-10 h-10 bg-[#E8EFFF] text-[#003B95] rounded-full flex items-center justify-center mb-4">
+            <span className="material-symbols-outlined text-xl">lock</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A2E46] mb-2 font-['Inter',sans-serif]">
+            Welcome to GweSha HealthTech
+          </h1>
+          <p className="text-gray-500 text-sm">Securely access your patient portal</p>
         </div>
 
         {/* Role Tabs */}
-        <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-gray-100">
+        <div className="flex border-b border-gray-200 mb-6">
           {ROLE_TABS.map(tab => (
             <button
               key={tab.id}
               type="button"
               onClick={() => handleRoleSwitch(tab.id)}
-              className={`flex flex-col items-center gap-1 py-3 px-2 rounded-xl text-xs font-bold transition-all ${
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${
                 selectedRole === tab.id
-                  ? "bg-white shadow-sm text-[#00605A]"
+                  ? "text-[#003B95] border-b-2 border-[#003B95]"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <span className="material-symbols-outlined text-[1.375rem]">{tab.icon}</span>
               {tab.label}
             </button>
           ))}
         </div>
 
-        {/* Role Description */}
-        <div className="flex items-start gap-3 bg-[#EAF8F8] rounded-xl px-4 py-3">
-          <span className="material-symbols-outlined text-[#00605A] text-[1.25rem] mt-0.5">info</span>
-          <div>
-            <div className="text-xs font-bold text-[#00605A]">{currentTab.label} Portal</div>
-            <div className="text-[0.6875rem] text-[#00605A]/70 mt-0.5">{currentTab.description}</div>
-          </div>
-        </div>
+
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email-address" className="sr-only">Email address</label>
-            <input
-              id="email-address"
-              name="email"
-              type="text"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="appearance-none block w-full px-4 py-3 placeholder-gray-500 focus:outline-none focus:ring-2 sm:text-sm transition-colors"
-              style={{ background: "var(--color-surface)", border: "1px solid var(--color-outline-variant)", color: "var(--color-on-surface)", borderRadius: "1rem" }}
-              placeholder="Email address"
-            />
+            <label htmlFor="email-address" className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                <span className="material-symbols-outlined text-lg">mail</span>
+              </span>
+              <input
+                id="email-address"
+                name="email"
+                type="text"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="appearance-none block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003B95] sm:text-sm"
+                placeholder="name@email.com"
+              />
+            </div>
           </div>
           <div>
-            <label htmlFor="password" className="sr-only">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="appearance-none block w-full px-4 py-3 placeholder-gray-500 focus:outline-none focus:ring-2 sm:text-sm transition-colors"
-              style={{ background: "var(--color-surface)", border: "1px solid var(--color-outline-variant)", color: "var(--color-on-surface)", borderRadius: "1rem" }}
-              placeholder="Password"
-            />
+            <div className="flex justify-between items-center mb-1">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700">Password</label>
+              <a href="#" className="text-xs font-semibold text-[#003B95] hover:underline">Forgot Password?</a>
+            </div>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                <span className="material-symbols-outlined text-lg">key</span>
+              </span>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="appearance-none block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003B95] sm:text-sm"
+                placeholder="••••••••"
+              />
+              <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400">
+                <span className="material-symbols-outlined text-lg">visibility</span>
+              </button>
+            </div>
           </div>
 
           {error && (
@@ -177,24 +185,31 @@ export default function Login() {
             </div>
           )}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 rounded" style={{ borderColor: "var(--color-outline)", accentColor: "var(--color-primary)" }} />
-              <label htmlFor="remember-me" className="ml-2 block text-sm" style={{ color: "var(--color-on-surface-variant)" }}>Remember me</label>
-            </div>
-            <a href="#" className="text-sm font-semibold transition-colors" style={{ color: "var(--color-primary)" }}>Forgot password?</a>
-          </div>
+
 
           <button
             type="submit"
             disabled={loading}
-            className="btn btn-primary w-full justify-center py-3 text-[0.875rem] disabled:opacity-60"
+            className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#003B95] hover:bg-[#002D73] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#003B95] disabled:opacity-60"
           >
-            {loading ? (
-              <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[1.125rem] animate-spin">progress_activity</span> Signing in...</span>
-            ) : (
-              <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[1.125rem]">login</span> Sign in as {currentTab.label}</span>
-            )}
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+          
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-2 bg-white text-gray-500 uppercase">OR</span>
+            </div>
+          </div>
+          
+          <button
+            type="button"
+            className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#003B95]"
+          >
+            <span className="material-symbols-outlined text-lg">fingerprint</span>
+            Sign in with Biometrics
           </button>
         </form>
 
@@ -205,19 +220,22 @@ export default function Login() {
             <div>{demo.email}</div>
             <div>{demo.password}</div>
           </div>
-          <button type="button" onClick={fillDemo} className="text-[0.6875rem] font-bold text-[#00605A] hover:underline">
+          <button type="button" onClick={fillDemo} className="text-[0.6875rem] font-bold text-[#003B95] hover:underline">
             Auto-fill credentials →
           </button>
         </div>
 
-        {selectedRole === "patient" && (
-          <p className="text-center text-sm" style={{ color: "var(--color-on-surface-variant)" }}>
-            Don't have an account?{" "}
-            <Link to="/register" className="font-semibold transition-colors" style={{ color: "var(--color-primary)" }}>
-              Register here
-            </Link>
-          </p>
-        )}
+        <p className="text-center text-sm text-gray-600">
+          Don't have an account?{" "}
+          <Link to="/register" className="font-semibold text-[#003B95] hover:underline">
+            Register
+          </Link>
+        </p>
+
+        <div className="flex justify-center items-center gap-1.5 mt-8 text-gray-400 text-xs font-semibold tracking-wider">
+          <span className="material-symbols-outlined text-sm">verified_user</span>
+          HIPAA COMPLIANT ENVIRONMENT
+        </div>
       </div>
     </div>
   );

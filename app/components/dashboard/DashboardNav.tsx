@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import { toast } from "sonner";
 import { useData } from "~/lib/DataContext";
 import {
@@ -12,6 +12,7 @@ import {
 
 export default function DashboardNav() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { notifications } = useData();
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -82,13 +83,30 @@ export default function DashboardNav() {
   return (
     <nav className="fixed top-0 w-full z-50 bg-[var(--color-surface)]/85 backdrop-blur-md shadow-[0px_12px_32px_rgba(28,28,25,0.06)]">
       <div className="flex justify-between items-center px-8 h-20 w-full font-['Public_Sans'] tracking-tight">
-        <Link to="/" className="text-2xl font-bold text-[var(--color-primary)]">The Sanctuary Portal</Link>
+        <Link to="/" className="text-2xl font-bold text-[var(--color-primary)]">GweSha HealthTech</Link>
 
-        <div className="hidden md:flex items-center gap-8">
-          <Link to="/dashboard" className="text-[var(--color-primary)] font-bold border-b-2 border-[var(--color-primary)] pb-1 transition-all duration-300 ease-in-out">Dashboard</Link>
-          <Link to="/appointment" className="text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors duration-300 ease-in-out">Appointments</Link>
-          <Link to="/records" className="text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors duration-300 ease-in-out">Health Records</Link>
-          <Link to="/billing" className="text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors duration-300 ease-in-out">Billing</Link>
+        <div className="hidden md:flex items-center gap-8 h-full">
+          {[
+            { name: "Dashboard", path: "/dashboard" },
+            { name: "Appointments", path: "/appointment" },
+            { name: "Health Records", path: "/records" },
+            { name: "Billing", path: "/billing" },
+          ].map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center h-full px-1 border-b-2 transition-all duration-300 ease-in-out text-sm font-bold ${
+                  isActive
+                    ? "text-[var(--color-primary)] border-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] border-transparent hover:text-[var(--color-primary)]"
+                }`}
+              >
+                {item.name}
+              </Link>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-6">

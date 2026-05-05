@@ -13,8 +13,7 @@ class SpecialistController extends Controller
     public function index()
     {
         try {
-            $specialists = StaffMember::where('role', 'doctor')
-                ->select([
+            $specialists = StaffMember::select([
                     'id',
                     'name',
                     'email',
@@ -33,7 +32,9 @@ class SpecialistController extends Controller
                     // Generate full URL for profile image
                     $imageUrl = null;
                     if ($specialist->profile_image) {
-                        $imageUrl = asset($specialist->profile_image);
+                        $imageUrl = str_starts_with($specialist->profile_image, 'http') 
+                            ? $specialist->profile_image 
+                            : asset($specialist->profile_image);
                     }
 
                     return [

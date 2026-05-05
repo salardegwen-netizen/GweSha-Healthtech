@@ -58,8 +58,8 @@ export default function BillingConsole() {
   useEffect(() => {
     const invoicesList = (rawInvoices || []).map((inv: any) => ({
       id: inv.id?.toString(),
-      patient: inv.patient_name,
-      patient_name: inv.patient_name,
+      patient: inv.patient?.first_name ? `${inv.patient.first_name} ${inv.patient.last_name || ''}`.trim() : 'Unknown Patient',
+      patient_name: inv.patient?.first_name ? `${inv.patient.first_name} ${inv.patient.last_name || ''}`.trim() : 'Unknown Patient',
       date: new Date(inv.date || inv.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
       amount: parseFloat(inv.amount) || 0,
       status: inv.status || "Pending",
@@ -107,7 +107,7 @@ export default function BillingConsole() {
         invoice.id,
         invoice.patient_name || invoice.patient,
         invoice.date,
-        `$${invoice.amount.toFixed(2)}`,
+        `₱${invoice.amount.toFixed(2)}`,
         invoice.status,
       ]);
 
@@ -186,12 +186,12 @@ export default function BillingConsole() {
 
   return (
     <div className="mt-8 relative mb-12">
-      <Badge className="absolute -top-3 left-6 z-10 bg-[#00605A] text-white hover:bg-[#00605A] border-none px-4 shadow-md font-bold uppercase tracking-wider text-[0.6875rem]">Financial Hub</Badge>
+      <Badge className="absolute -top-3 left-6 z-10 bg-[#003B95] text-white hover:bg-[#003B95] border-none px-4 shadow-md font-bold uppercase tracking-wider text-[0.6875rem]">Financial Hub</Badge>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
         <Card className="bg-white p-6 rounded-[1.5rem] shadow-sm border border-gray-100 flex flex-col justify-center">
           <div className="text-[0.6875rem] font-bold text-gray-400 uppercase tracking-widest mb-1">Today's Revenue</div>
-          <div className="text-3xl font-extrabold text-gray-900">${metrics.todayRevenue.toFixed(2)}</div>
+          <div className="text-3xl font-extrabold text-gray-900">₱{metrics.todayRevenue.toFixed(2)}</div>
         </Card>
         <Card className="bg-white p-6 rounded-[1.5rem] shadow-sm border border-gray-100 flex flex-col justify-center">
           <div className="text-[0.6875rem] font-bold text-gray-400 uppercase tracking-widest mb-1">Pending Invoices</div>
@@ -199,7 +199,7 @@ export default function BillingConsole() {
         </Card>
         <Card className="bg-white p-6 rounded-[1.5rem] shadow-sm border border-gray-100 flex flex-col justify-center">
           <div className="text-[0.6875rem] font-bold text-gray-400 uppercase tracking-widest mb-1">Outstanding Balance</div>
-          <div className="text-3xl font-extrabold text-[#ECAF20]">${metrics.outstandingBalance.toFixed(2)}</div>
+          <div className="text-3xl font-extrabold text-[#ECAF20]">₱{metrics.outstandingBalance.toFixed(2)}</div>
         </Card>
       </div>
 
@@ -209,7 +209,7 @@ export default function BillingConsole() {
           <div className="flex gap-2">
             <Button
               onClick={() => setShowCreateDialog(true)}
-              className="h-auto py-1.5 px-3 text-xs font-bold bg-[#00605A] text-white hover:bg-[#004f4a] rounded-lg"
+              className="h-auto py-1.5 px-3 text-xs font-bold bg-[#003B95] text-white hover:bg-[#002D73] rounded-lg"
             >
               + Create Invoice
             </Button>
@@ -253,7 +253,7 @@ export default function BillingConsole() {
                     <TableCell className="px-5 py-4 font-mono text-[0.6875rem] text-gray-500 font-bold">{bill.id}</TableCell>
                     <TableCell className="px-5 py-4 font-bold text-sm text-gray-900">{bill.patient_name || bill.patient}</TableCell>
                     <TableCell className="px-5 py-4 text-xs font-medium text-gray-600">{bill.date}</TableCell>
-                    <TableCell className="px-5 py-4 text-sm font-extrabold text-gray-900 text-right">${bill.amount.toFixed(2)}</TableCell>
+                    <TableCell className="px-5 py-4 text-sm font-extrabold text-gray-900 text-right">₱{bill.amount.toFixed(2)}</TableCell>
                     <TableCell className="px-5 py-4 text-center">
                       <Badge variant="secondary" className={`inline-flex px-2.5 py-0.5 rounded-md text-[0.625rem] font-extrabold tracking-wider uppercase border-none ${bill.statusColor}`}>
                         {bill.status}
@@ -264,7 +264,7 @@ export default function BillingConsole() {
                         onClick={() => setSelectedInvoice(bill)}
                         variant="ghost"
                         size="sm"
-                        className="text-xs font-bold text-[#00605A] hover:bg-[#EAF8F8]"
+                        className="text-xs font-bold text-[#003B95] hover:bg-[#E8EFFF]"
                       >
                         View
                       </Button>
@@ -280,7 +280,7 @@ export default function BillingConsole() {
       <Dialog open={!!selectedInvoice} onOpenChange={(open) => !open && setSelectedInvoice(null)}>
         <DialogContent className="sm:max-w-[425px] rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="font-[var(--font-headline)] text-xl text-[#00605A] font-extrabold pb-2 border-b border-gray-100">Invoice Details</DialogTitle>
+            <DialogTitle className="font-[var(--font-headline)] text-xl text-[#003B95] font-extrabold pb-2 border-b border-gray-100">Invoice Details</DialogTitle>
             <DialogDescription className="text-sm pt-2">
               Viewing financial record for {selectedInvoice?.patient_name || selectedInvoice?.patient}.
             </DialogDescription>
@@ -297,7 +297,7 @@ export default function BillingConsole() {
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-50">
                 <span className="text-xs font-bold text-gray-500 uppercase">Total Amount</span>
-                <span className="text-lg font-extrabold text-[#00605A]">${selectedInvoice.amount.toFixed(2)}</span>
+                <span className="text-lg font-extrabold text-[#003B95]">₱{selectedInvoice.amount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center py-2">
                 <span className="text-xs font-bold text-gray-500 uppercase">Current Status</span>
@@ -318,7 +318,7 @@ export default function BillingConsole() {
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="sm:max-w-[500px] rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="font-[var(--font-headline)] text-xl text-[#00605A] font-extrabold pb-2 border-b border-gray-100">Create New Invoice</DialogTitle>
+            <DialogTitle className="font-[var(--font-headline)] text-xl text-[#003B95] font-extrabold pb-2 border-b border-gray-100">Create New Invoice</DialogTitle>
             <DialogDescription className="text-sm pt-2">
               Issue a new invoice to a patient for services rendered.
             </DialogDescription>
@@ -331,7 +331,7 @@ export default function BillingConsole() {
                 id="patient"
                 value={formData.patient_id}
                 onChange={(e) => setFormData({ ...formData, patient_id: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#00605A] outline-none"
+                className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#003B95] outline-none"
               >
                 <option value="">-- Choose a patient --</option>
                 {(rawPatients || []).map((patient: any) => (
@@ -343,7 +343,7 @@ export default function BillingConsole() {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="amount" className="text-xs font-bold uppercase text-gray-600">Amount ($)</Label>
+              <Label htmlFor="amount" className="text-xs font-bold uppercase text-gray-600">Amount (₱)</Label>
               <Input
                 id="amount"
                 type="number"
@@ -362,7 +362,7 @@ export default function BillingConsole() {
                 placeholder="e.g., Consultation, Lab Work, Procedure..."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#00605A] outline-none resize-none h-24"
+                className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#003B95] outline-none resize-none h-24"
               />
             </div>
 
@@ -372,7 +372,7 @@ export default function BillingConsole() {
                 id="status"
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#00605A] outline-none"
+                className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#003B95] outline-none"
               >
                 <option value="due">Due</option>
                 <option value="pending">Pending</option>
@@ -396,7 +396,7 @@ export default function BillingConsole() {
             <Button
               onClick={handleCreateInvoice}
               disabled={isCreating}
-              className="text-xs font-bold bg-[#00605A] text-white hover:bg-[#004f4a]"
+              className="text-xs font-bold bg-[#003B95] text-white hover:bg-[#002D73]"
             >
               {isCreating ? "Creating..." : "Create Invoice"}
             </Button>

@@ -19,7 +19,7 @@ export default function Footer() {
           {/* Brand column */}
           <div className="md:w-1/3">
             <div className="text-base font-bold mb-2 tracking-tight" style={{ color: "var(--color-primary)", fontFamily: "var(--font-headline)" }}>
-              Sanctuary Health
+              MediClinic
             </div>
             <p className="text-xs leading-relaxed max-w-xs mb-4" style={{ color: "var(--color-on-surface-variant)" }}>
               Where advanced clinical expertise meets the warmth of intentional hospitality. Your path to restorative care starts here.
@@ -90,7 +90,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-3 pt-4 border-t" style={{ borderColor: "var(--color-outline-variant)" }}>
           <p className="text-[0.625rem] m-0" style={{ color: "rgba(28,28,25,0.5)" }}>
-            © 2024 Sanctuary Health Systems. All rights reserved.
+            © 2024 MediClinic Professional Healthcare. All rights reserved.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             {footerLinks.map((link) => (

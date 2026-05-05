@@ -140,7 +140,7 @@ export default function NotificationCenter({ open, onOpenChange }: Props) {
             onClick={() => setFilter("all")}
             className={`px-3 py-2 text-xs font-bold rounded-lg transition-colors ${
               filter === "all"
-                ? "bg-[#00605A] text-white"
+                ? "bg-[#003B95] text-white"
                 : "bg-gray-50 text-gray-700 hover:bg-gray-100"
             }`}
           >
@@ -150,7 +150,7 @@ export default function NotificationCenter({ open, onOpenChange }: Props) {
             onClick={() => setFilter("unread")}
             className={`px-3 py-2 text-xs font-bold rounded-lg transition-colors ${
               filter === "unread"
-                ? "bg-[#00605A] text-white"
+                ? "bg-[#003B95] text-white"
                 : "bg-gray-50 text-gray-700 hover:bg-gray-100"
             }`}
           >

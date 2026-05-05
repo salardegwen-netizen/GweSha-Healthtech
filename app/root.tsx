@@ -43,10 +43,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { Toaster } from "sonner";
+
 export default function App() {
   return (
     <DataProvider>
       <Outlet />
+      <Toaster position="top-center" richColors />
     </DataProvider>
   );
 }

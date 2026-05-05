@@ -19,12 +19,12 @@ export default function Navbar() {
           className="text-lg md:text-xl font-bold tracking-tight"
           style={{ color: "var(--color-primary)", fontFamily: "var(--font-headline)" }}
         >
-          Sanctuary Health
+          GweSha HealthTech
         </a>
 
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-7">
-          {["Wellness", "Specialists", "Care Plans", "Locations"].map((item) => (
+          {["Wellness", "Specialists", "About"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase().replace(" ", "-")}`}
@@ -39,7 +39,10 @@ export default function Navbar() {
         </div>
 
         {/* CTA buttons */}
-        <div className="hidden md:flex items-center gap-2.5">
+        <div className="hidden md:flex items-center gap-4">
+          <Link to="/admin" className="text-xs font-semibold" style={{ color: "rgba(28,28,25,0.65)" }}>
+            Admin Access
+          </Link>
           <Link to="/login" className="btn btn-primary" id="nav-patient-login">
             Patient Login
           </Link>
@@ -65,7 +68,7 @@ export default function Navbar() {
           className="md:hidden px-6 pb-6 pt-2 flex flex-col gap-4 shadow-lg border-t"
           style={{ background: "rgba(252,249,245,0.98)", borderColor: "var(--color-surface-container)" }}
         >
-          {["Wellness", "Specialists", "Care Plans", "Locations"].map((item) => (
+          {["Wellness", "Specialists", "About"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase().replace(" ", "-")}`}
@@ -77,6 +80,7 @@ export default function Navbar() {
             </a>
           ))}
           <div className="flex flex-col gap-2.5 pt-3 border-t" style={{ borderColor: "var(--color-surface-container-high)" }}>
+            <Link to="/admin" className="text-sm font-semibold mb-2" style={{ color: "var(--color-on-surface-variant)" }}>Admin Access</Link>
             <Link to="/login" className="btn btn-primary justify-center w-full">Patient Login</Link>
           </div>
         </div>

@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('patients', PatientController::class);
 
     // ========== APPOINTMENTS ==========
+    Route::delete('appointments/clear-all', [AppointmentController::class, 'clearAll']);
     Route::apiResource('appointments', AppointmentController::class);
 
     // ========== INVOICES & BILLING ==========

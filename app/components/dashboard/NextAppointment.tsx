@@ -84,36 +84,30 @@ export default function NextAppointment() {
 
   return (
     <div className="col-span-1 lg:col-span-8 bg-[var(--color-surface-container-low)] rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[200px]">
-      <div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
-        <img
-          alt="Health concept"
-          className="w-full h-full object-cover"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk6emqQld-MvVqgEx5nh2v37La7HyLnMu1PIasSnRJ2A5VrWnzZzE6Dt3XQQkJ7TjvP8ijVNrsiO-k4kRFmnuM0MRMXswbE9tW9uMS5wo14sY_Y1hccHwZ_WfJLyTlqmtHj56Pg3C_Mhw9Cqt9iwF174uZUfPRFerdhqfk6CnpWSJON1KKQDZVRxw6726qyYPv03L6uTlujqRGbMK-hRPzIERHHqgbBB6Bojg1lyX83HvU3RE-OUlT4lw_NQvD-nFyCGRohUtGyxID"
-        />
-      </div>
+      <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-[#003B95]/10 to-transparent pointer-events-none rounded-r-2xl"></div>
 
       <div className="relative z-10">
         <div className="flex items-center gap-1.5 mb-4">
-          <span className="material-symbols-outlined text-[1rem] text-[var(--color-tertiary)]">event</span>
-          <span className="text-[0.6875rem] font-bold tracking-wider uppercase text-[var(--color-tertiary)]">Upcoming Session</span>
+          <span className="material-symbols-outlined text-[1rem] text-[#003B95]">event</span>
+          <span className="text-[0.6875rem] font-bold tracking-wider uppercase text-[#003B95]">Upcoming Session</span>
         </div>
-        <h2 className="font-[var(--font-headline)] text-2xl font-bold text-[var(--color-on-surface)] mb-1">{appointment.procedure}</h2>
-        <p className="text-sm text-[var(--color-on-surface-variant)] font-medium">with {appointment.doctor?.name || 'Doctor'}</p>
+        <h2 className="font-[var(--font-headline)] text-2xl font-bold text-gray-900 mb-1">{appointment.procedure}</h2>
+        <p className="text-sm text-gray-600 font-medium">with {appointment.doctor?.name || 'Doctor'}</p>
       </div>
 
       <div className="relative z-10 flex flex-wrap items-center gap-6 mt-6">
         <div>
-          <p className="text-[0.625rem] uppercase tracking-widest text-[var(--color-on-surface-variant)] mb-0.5">Date</p>
-          <p className="text-lg font-bold">{formatDate(appointment.date_time)}</p>
+          <p className="text-[0.625rem] uppercase tracking-widest text-gray-500 mb-0.5 font-bold">Date</p>
+          <p className="text-lg font-bold text-gray-900">{formatDate(appointment.date_time)}</p>
         </div>
         <div>
-          <p className="text-[0.625rem] uppercase tracking-widest text-[var(--color-on-surface-variant)] mb-0.5">Time</p>
-          <p className="text-lg font-bold text-[var(--color-primary)]">{formatTime(appointment.date_time)}</p>
+          <p className="text-[0.625rem] uppercase tracking-widest text-gray-500 mb-0.5 font-bold">Time</p>
+          <p className="text-lg font-bold text-[#003B95]">{formatTime(appointment.date_time)}</p>
         </div>
         <div className="flex-grow flex xl:justify-end">
           <button
             onClick={() => navigate("/appointment")}
-            className="bg-[var(--color-surface-container-highest)] text-[var(--color-on-surface)] px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[var(--color-outline-variant)] hover:text-white transition-colors">
+            className="bg-white text-[#003B95] border-2 border-[#003B95] px-5 py-2 rounded-full text-sm font-bold hover:bg-[#003B95] hover:text-white transition-all shadow-sm">
             Manage Booking
           </button>
         </div>
