@@ -1,87 +1,77 @@
-# Welcome to React Router!
+# GweSha HealthTech 🏥
 
-A modern, production-ready template for building full-stack React applications using React Router.
+GweSha HealthTech is a modern, full-stack healthcare management platform designed for both patients and clinical administrators. It provides a seamless experience for appointment scheduling, patient record management, and clinical billing.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## ✨ Features
 
-## Features
+- **Patient Portal**: Self-service appointment booking with specialized doctors.
+- **Admin Dashboard**: Real-time calendar synchronization for shift management.
+- **Patient Directory**: Persistent database of patient history and records.
+- **Billing Console**: Automated invoicing and balance tracking.
+- **Real-time Sync**: Global state management ensuring data consistency across all modules.
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+## 🛠️ Tech Stack
 
-## Getting Started
+### Frontend
+- **Framework**: [React Router v7 (Remix)](https://reactrouter.com/)
+- **Styling**: [TailwindCSS](https://tailwindcss.com/)
+- **UI Components**: [Shadcn UI](https://ui.shadcn.com/) & [Base UI](https://base-ui.com/)
+- **State Management**: React Context with optimized polling.
+
+### Backend
+- **Framework**: [Laravel 11](https://laravel.com/)
+- **API**: RESTful architecture with Sanctum authentication.
+- **Database**: MySQL (XAMPP) & SQLite.
+
+## 🚀 Getting Started
 
 ### Installation
 
-Install the dependencies:
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/salardegwen-netizen/GweSha-Healthtech.git
+   ```
 
-```bash
-npm install
-```
+2. **Install Frontend Dependencies**:
+   ```bash
+   cd health
+   npm install
+   ```
+
+3. **Install Backend Dependencies**:
+   ```bash
+   cd backend
+   composer install
+   ```
+
+4. **Environment Setup**:
+   Copy `.env.example` to `.env` in both the root and backend directories and configure your database credentials.
 
 ### Development
 
-Start the development server with HMR:
-
+Start the frontend development server:
 ```bash
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
-
+Start the backend server:
 ```bash
-npm run build
+cd backend
+php artisan serve
 ```
 
-## Deployment
+## 📐 System Architecture
 
-### Docker Deployment
+GweSha HealthTech uses a decoupled architecture where the Frontend acts as a single-page application (SPA) communicating with a Laravel API.
 
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
+```mermaid
+graph LR
+    User((User)) --> Frontend[Remix Frontend]
+    Frontend --> Context[DataContext Layer]
+    Context --> API[Laravel API]
+    API --> DB[(MySQL / SQLite)]
 ```
 
-The containerized application can be deployed to any platform that supports Docker, including:
+## 📝 License
 
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+Built with ❤️ by GweSha HealthTech Team.
